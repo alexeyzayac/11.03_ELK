@@ -22,16 +22,15 @@
             # server.host: "0.0.0.0"
             # elasticsearch.hosts: ["https://127.0.0.1:9200"]
 8. systemctl enable --now kibana
-9. systemctl restart kibanacurl -I http://62.84.114.0:5601
-
+9. systemctl restart kibana
 
 ###########
 # Задание 3
 ###########
 
-dpkg -i logstash-8.9.2-amd64.deb && apt -f install
-apt install nginx -y
-systemctl enable --now nginx
+10. dpkg -i logstash-8.9.2-amd64.deb && apt -f install
+11. apt install nginx -y
+12. systemctl enable --now nginx
 
 
 

@@ -37,6 +37,8 @@
 
 #### Решение:
 
+![img](img/screenshot_2.png)
+
 ---
 
 ### Задание 3. Logstash

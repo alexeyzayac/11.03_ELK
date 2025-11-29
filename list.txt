@@ -2,25 +2,41 @@
 # Задание 1
 ###########
 
-1. wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
-2. echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
-3. apt update && apt install elasticsearch -y
-4. systemctl enable --now elasticsearch
-5. nano /etc/elasticsearch/elasticsearch.yml
+1. dpkg -i elasticsearch-8.9.2-amd64.deb && apt -f install
+2. nano /etc/elasticsearch/elasticsearch.yml
             # cluster.name: alexey-zayac
             # network.host: 127.0.0.1
             # http.port: 9200
             # xpack.security.enabled: false
             # xpack.security.http.ssl.enabled: false
-7. nano /etc/elasticsearch/jvm.options
-            # -Xms4g
-            # -Xmx4g
-8. systemctl restart elasticsearch
-9. curl -X GET 'http://localhost:9200/_cluster/health?pretty'
+3. systemctl enable --now elasticsearch
+4. systemctl restart elasticsearch
+5. curl -X GET 'http://localhost:9200/_cluster/health?pretty'
 
 ###########
 # Задание 2
 ###########
 
-10. curl -L -O https://artifacts.elastic.co/downloads/kibana/kibana-8.11.2-amd64.deb
-11. 
+6. dpkg -i kibana-8.9.2-amd64.deb && apt -f install
+7. nano /etc/kibana/kibana.yml
+            # server.host: "0.0.0.0"
+            # elasticsearch.hosts: ["https://127.0.0.1:9200"]
+8. systemctl enable --now kibana
+9. systemctl restart kibanacurl -I http://62.84.114.0:5601
+
+
+###########
+# Задание 3
+###########
+
+dpkg -i logstash-8.9.2-amd64.deb && apt -f install
+apt install nginx -y
+systemctl enable --now nginx
+
+
+
+###########
+# Задание 4
+###########
+
+dpkg -i filebeat-8.9.2-amd64.deb && apt -f install

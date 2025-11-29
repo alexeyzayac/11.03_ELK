@@ -1,0 +1,24 @@
+###########
+# Задание 1
+###########
+
+1. wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
+2. echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
+3. apt update && apt install elasticsearch -y
+4. systemctl enable --now elasticsearch
+5. nano /etc/elasticsearch/elasticsearch.yml
+            # cluster.name: alexey-zayac
+            # network.host: 127.0.0.1
+            # http.port: 9200
+            # xpack.security.enabled: false
+            # xpack.security.http.ssl.enabled: false
+7. nano /etc/elasticsearch/jvm.options
+            # -Xms4g
+            # -Xmx4g
+8. systemctl restart elasticsearch
+9. curl -X GET 'http://localhost:9200/_cluster/health?pretty'
+
+###########
+# Задание 2
+###########
+

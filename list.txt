@@ -22,3 +22,5 @@
 # Задание 2
 ###########
 
+10. curl -L -O https://artifacts.elastic.co/downloads/kibana/kibana-8.11.2-amd64.deb
+11. 

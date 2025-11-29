@@ -4,11 +4,15 @@
 
 1. dpkg -i elasticsearch-8.9.2-amd64.deb && apt -f install
 2. nano /etc/elasticsearch/elasticsearch.yml
-            # cluster.name: alexey-zayac
-            # network.host: 127.0.0.1
-            # http.port: 9200
-            # xpack.security.enabled: false
-            # xpack.security.http.ssl.enabled: false
+
+##################################################################
+cluster.name: alexey-zayac
+network.host: 127.0.0.1
+http.port: 9200
+xpack.security.enabled: false
+xpack.security.http.ssl.enabled: false
+##################################################################
+
 3. systemctl enable --now elasticsearch
 4. systemctl restart elasticsearch
 5. curl -X GET 'http://localhost:9200/_cluster/health?pretty'
@@ -19,8 +23,12 @@
 
 6. dpkg -i kibana-8.9.2-amd64.deb && apt -f install
 7. nano /etc/kibana/kibana.yml
-            # server.host: "0.0.0.0"
-            # elasticsearch.hosts: ["https://127.0.0.1:9200"]
+
+##################################################################
+server.host: "0.0.0.0"
+elasticsearch.hosts: ["https://127.0.0.1:9200"]
+##################################################################
+
 8. systemctl enable --now kibana
 9. systemctl restart kibana
 
@@ -30,12 +38,94 @@
 
 10. dpkg -i logstash-8.9.2-amd64.deb && apt -f install
 11. apt install nginx -y
-12. systemctl enable --now nginx
+12. nano /etc/logstash/conf.d/nginx.conf
 
+##################################################################
+input {
+  file {
+    path => "/var/log/nginx/access.log"
+    start_position => "beginning"
+  }
+}
 
+filter {
+  grok {
+    match => { "message" => "%{COMBINEDAPACHELOG}" }
+  }
+  date {
+    match => [ "timestamp" , "dd/MMM/yyyy:HH:mm:ss Z" ]
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["http://localhost:9200"]
+    index => "nginx-logs-%{+YYYY.MM.dd}"
+  }
+  stdout { codec => rubydebug }
+}
+input {
+  file {
+    path => "/var/log/nginx/access.log"
+    start_position => "beginning"
+  }
+}
+
+filter {
+  grok {
+    match => { "message" => "%{COMBINEDAPACHELOG}" }
+  }
+  date {
+    match => [ "timestamp" , "dd/MMM/yyyy:HH:mm:ss Z" ]
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["http://localhost:9200"]
+    index => "nginx-logs-%{+YYYY.MM.dd}"
+  }
+  stdout { codec => rubydebug }
+}
+##################################################################
+
+13. sudo usermod -aG adm logstash
+14. systemctl enable --now nginx
+15. sudo systemctl enable --now logstash
+16. systemctl restart logstash kibana nginx
+17. for i in {1..2000}; do curl -s http://localhost > /dev/null; done
 
 ###########
 # Задание 4
 ###########
 
-dpkg -i filebeat-8.9.2-amd64.deb && apt -f install
+18. dpkg -i filebeat-8.9.2-amd64.deb && apt -f install
+19. sudo nano /etc/filebeat/filebeat.yml
+
+##################################################################
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+
+#output.logstash:
+#  hosts: ["localhost:5044"]
+##################################################################
+
+20. filebeat modules enable nginx
+21. nano /etc/filebeat/modules.d/nginx.yml
+
+##################################################################
+- module: nginx
+  access:
+    enabled: true
+    var.paths:
+      - /var/log/nginx/access.log
+
+  error:
+    enabled: true
+    var.paths:
+      - /var/log/nginx/error.log
+##################################################################
+22. filebeat setup --index-management --pipelines
+23. systemctl enable --now filebeat
+24. sudo systemctl restart filebeat
+25. for i in {1..2000}; do curl -s http://localhost > /dev/null; done
